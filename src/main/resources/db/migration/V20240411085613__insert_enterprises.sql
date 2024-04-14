@@ -1,0 +1,1 @@
+INSERT INTO enterprise (title) VALUES ('Luar de Angelita'), ('Carme leda');
