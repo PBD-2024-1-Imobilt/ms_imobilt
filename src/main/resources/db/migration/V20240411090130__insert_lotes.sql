@@ -1,0 +1,1 @@
+INSERT INTO lote (enterprize_id, block, lote) VALUES (1, '24', '24'), (1, '24', '12'), (2, '24', '24');
