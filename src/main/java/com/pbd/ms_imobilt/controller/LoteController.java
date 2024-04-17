@@ -19,7 +19,7 @@ public class LoteController {
 
     private final LoteService loteService;
 
-    @GetMapping("/lands")
+    @GetMapping("/lotes")
     public ResponseEntity<Map<String, List<Lote>>> getAllLands(@RequestHeader("token") String tokenSHearder){
         return ResponseEntity.ok(loteService.getAllLandsService(tokenSHearder));
     }
