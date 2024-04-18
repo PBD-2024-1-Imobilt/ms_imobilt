@@ -6,13 +6,14 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "enterprise")
-public class Enterprise {
-
+@Table(name = "block")
+public class Block {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Size(max = 255)
+    @Size(max = 100)
     private String description;
+    @ManyToOne
+    @JoinColumn(name = "enterprise_id")
+    private Enterprise enterprise;
 }
