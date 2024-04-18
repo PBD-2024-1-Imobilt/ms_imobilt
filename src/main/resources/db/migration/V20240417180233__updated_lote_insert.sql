@@ -1,0 +1,1 @@
+INSERT INTO lote (description, block_id) VALUES ('24', 1), ('12',2),('24',3);

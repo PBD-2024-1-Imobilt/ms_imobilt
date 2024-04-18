@@ -1,0 +1,1 @@
+ALTER TABLE lote DROP COLUMN block;

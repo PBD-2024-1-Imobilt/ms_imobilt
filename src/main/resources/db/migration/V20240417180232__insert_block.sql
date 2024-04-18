@@ -1,0 +1,1 @@
+INSERT INTO block (description, enterprise_id) VALUES ('24', 1), ('24', 1), ('24', 2);
