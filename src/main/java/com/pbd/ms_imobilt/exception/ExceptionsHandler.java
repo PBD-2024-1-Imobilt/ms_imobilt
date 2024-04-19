@@ -12,15 +12,27 @@ import java.net.URI;
 @RestControllerAdvice
 public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(HttpClientErrorException.class)
-    public ProblemDetail invalidTokenException(){
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
-        problemDetail.setTitle("Authorization denied: Invalid token");
+    private ProblemDetail problemDetailConfig(HttpStatus httpStatus, String error, String uri){
+        ProblemDetail problemDetail = ProblemDetail.forStatus(httpStatus);
+        problemDetail.setTitle(error);
         problemDetail.setType(
-                URI.create(
-                        "http://localhost:8081/api/v1/lands"
-                )
+                URI.create(uri)
         );
         return problemDetail;
     }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ProblemDetail invalidTokenException(){
+        return problemDetailConfig(HttpStatus.UNAUTHORIZED,
+                "Authorization denied: Invalid token",
+                "http://localhost:8081/api/v1/lotes"
+                );
+    }
+
+//    @ExceptionHandler(NullPointerException.class)
+//    public ProblemDetail blankErrorException(NullPointerException e){
+//        return problemDetailConfig(HttpStatus.INTERNAL_SERVER_ERROR,
+//                e.getMessage(),
+//                "http://localhost:8081/api/v1/lotes" );
+//    }
 }
