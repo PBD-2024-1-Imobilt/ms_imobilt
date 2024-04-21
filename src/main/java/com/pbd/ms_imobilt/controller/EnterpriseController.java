@@ -1,11 +1,15 @@
 package com.pbd.ms_imobilt.controller;
 
+import com.pbd.ms_imobilt.dto.BlockReqDto;
 import com.pbd.ms_imobilt.dto.EnterpriseReqDto;
 import com.pbd.ms_imobilt.dto.EnterpriseRespDto;
 import com.pbd.ms_imobilt.model.Enterprise;
 import com.pbd.ms_imobilt.service.EnterpriseService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +34,13 @@ public class EnterpriseController {
                         ).getId()
                 )
         );
+    }
+
+    @PostMapping("{enterprise_id}/blocks")
+    public void postCreateBlocks(
+            @PathVariable(name = "enterprise_id") Integer enterpriseId ,
+            @RequestBody List<BlockReqDto> listBlocks){
+
     }
 
 }
