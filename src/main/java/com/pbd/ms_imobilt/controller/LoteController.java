@@ -1,6 +1,7 @@
 package com.pbd.ms_imobilt.controller;
 
 import com.pbd.ms_imobilt.dto.LoteRespDto;
+import com.pbd.ms_imobilt.infra.security.TokenHearder;
 import com.pbd.ms_imobilt.service.LoteService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class LoteController {
 
     @GetMapping("/lotes")
     public ResponseEntity<Map<String, List<LoteRespDto>>> getAllLotes(@RequestHeader("token") String tokenHearder){
-        return ResponseEntity.ok(loteService.getAllLotesService(tokenHearder));
+        TokenHearder.setToken(tokenHearder);
+        return ResponseEntity.ok(loteService.getAllLotesService());
     }
 }

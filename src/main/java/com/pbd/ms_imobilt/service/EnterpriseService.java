@@ -1,6 +1,7 @@
 package com.pbd.ms_imobilt.service;
 
 import com.pbd.ms_imobilt.infra.security.TokenAuthenticationService;
+import com.pbd.ms_imobilt.infra.security.TokenHearder;
 import com.pbd.ms_imobilt.model.Enterprise;
 import com.pbd.ms_imobilt.repository.EnterpriseRepository;
 import lombok.AllArgsConstructor;
@@ -17,9 +18,13 @@ public class EnterpriseService {
 
     private final TokenAuthenticationService authToken;
 
+    public Enterprise getEnterpriseByIDService(Integer id){
+        return enterpriseRepository.findById(id).get();
+    }
+
     @Transactional
-    public Enterprise saveService(String tokenHeader, Enterprise enterprise){
-        if (authToken.tokenHearderValidation(tokenHeader))
+    public Enterprise saveService(Enterprise enterprise){
+        if (authToken.tokenHearderValidation(TokenHearder.token))
             return enterpriseRepository.save(enterprise);
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }

@@ -3,10 +3,12 @@ package com.pbd.ms_imobilt.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "lote")
 @Getter
+@Setter
 public class Lote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
