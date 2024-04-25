@@ -3,9 +3,12 @@ package com.pbd.ms_imobilt.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import com.pbd.ms_imobilt.infra.security.TokenHearder;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.pbd.ms_imobilt.dto.LoteRespDto;
@@ -31,6 +34,10 @@ public class LoteService {
 
     private final TokenAuthenticationService authToken;
 
+    public Optional<Lote> findByDescriptionAndBlockService(String description, Block block){
+        return loteRepository.findByDescriptionAndBlock(description, block);
+    }
+
     private LoteRespDto formatterLote(Lote lote) {
         Block block = blockRepository.findById(lote.getBlock().getId()).get();
 
@@ -47,41 +54,13 @@ public class LoteService {
 
     }
 
-    public Map<String, List<LoteRespDto>> getAllLotesService(String tokenHearder){
-        /*COMO A SAÍDA ESTAR:
-        {
-      "id": 4,
-      "description": "24",
-      "block": {
-        "id": 1,
-        "description": "24",
-        "enterprise": {
-          "id": 1,
-          "description": "Luar de Angelita"
-        }
-      }
-    },
-        COMO ELA DEVE FICAR:
-
-        COLOCAR ESSA FUNÇÃO NESSE TEMPLATE:
-        *
-        * {'response':[
-            {
-              'id': 12, # É o id do lote
-              'lote': 'Lote 1' # É a description do lote
-              'enterprise': {
-                      'id': 1,
-                      'description': 'Luar de angelita'
-                      },
-              'block':'Quadra A', # é a description da Quadra
-            }
-      ]}*/
+    public Map<String, List<LoteRespDto>> getAllLotesService(){
         Map<String, List<LoteRespDto>> map = new HashMap<>();
         map.put(
                 "response", loteRepository
                         .findAll()
                         .stream()
-                        .filter(e -> authToken.tokenHearderValidation(tokenHearder))
+                        .filter(e -> authToken.tokenHearderValidation(TokenHearder.token))
                         .map(this::formatterLote)
                         .toList()
         );
@@ -90,5 +69,12 @@ public class LoteService {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
 
         return map;
+    }
+
+    @Transactional
+    public Lote saveLoteService(Lote lote){
+        if (authToken.tokenHearderValidation(TokenHearder.token))
+            return loteRepository.save(lote);
+        throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
 }
