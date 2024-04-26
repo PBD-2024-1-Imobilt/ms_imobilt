@@ -3,11 +3,13 @@ package com.pbd.ms_imobilt.infra.security;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pbd.ms_imobilt.token.model.TokenHearder;
+import com.pbd.ms_imobilt.token.service.TokenAuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.pbd.ms_imobilt.dto.InputBlocksAndLotesReqDto;
-import com.pbd.ms_imobilt.dto.InputLoteReqDto;
+import com.pbd.ms_imobilt.enterprise.dto.InputBlocksAndLotesReqDto;
+import com.pbd.ms_imobilt.lote.dto.InputLoteReqDto;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.client.HttpClientErrorException;
