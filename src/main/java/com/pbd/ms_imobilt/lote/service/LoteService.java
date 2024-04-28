@@ -16,9 +16,9 @@ import com.pbd.ms_imobilt.token.service.TokenAuthenticationService;
 import com.pbd.ms_imobilt.block.model.Block;
 import com.pbd.ms_imobilt.enterprise.model.Enterprise;
 import com.pbd.ms_imobilt.lote.model.Lote;
-import com.pbd.ms_imobilt.block.repository.BlockRepository;
-import com.pbd.ms_imobilt.enterprise.repository.EnterpriseRepository;
-import com.pbd.ms_imobilt.lote.repository.LoteRepository;
+import com.pbd.ms_imobilt.block.repository.BlockRepositoryI;
+import com.pbd.ms_imobilt.enterprise.repository.EnterpriseRepositoryI;
+import com.pbd.ms_imobilt.lote.repository.LoteRepositoryI;
 
 import lombok.AllArgsConstructor;
 
@@ -26,11 +26,11 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class LoteService {
 
-    private final LoteRepository loteRepository;
+    private final LoteRepositoryI loteRepository;
 
-    private final BlockRepository blockRepository;
+    private final BlockRepositoryI blockRepository;
 
-    private final EnterpriseRepository enterpriseRepository;
+    private final EnterpriseRepositoryI enterpriseRepository;
 
     private final TokenAuthenticationService authToken;
 
