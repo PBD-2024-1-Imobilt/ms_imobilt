@@ -1,2 +1,6 @@
-package com.pbd.ms_imobilt.client.dto;public record ClientRespDto() {
+package com.pbd.ms_imobilt.client.dto;
+
+import jakarta.validation.constraints.NotNull;
+
+public record ClientRespDto(@NotNull Integer id) {
 }

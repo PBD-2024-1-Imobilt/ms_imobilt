@@ -3,7 +3,7 @@ package com.pbd.ms_imobilt.enterprise.service;
 import com.pbd.ms_imobilt.token.service.TokenAuthenticationService;
 import com.pbd.ms_imobilt.token.model.TokenHearder;
 import com.pbd.ms_imobilt.enterprise.model.Enterprise;
-import com.pbd.ms_imobilt.enterprise.repository.EnterpriseRepository;
+import com.pbd.ms_imobilt.enterprise.repository.EnterpriseRepositoryI;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 @AllArgsConstructor
 public class EnterpriseService {
 
-    private final EnterpriseRepository enterpriseRepository;
+    private final EnterpriseRepositoryI enterpriseRepository;
 
     private final TokenAuthenticationService authToken;
 
