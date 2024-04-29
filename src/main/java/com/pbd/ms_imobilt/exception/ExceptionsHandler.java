@@ -49,4 +49,11 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
                 "http://localhost:8081/api/v1/lotes"
                 );
     }
+
+    @ExceptionHandler(ClientNotFoundException.class)
+    public ProblemDetail clientNotFoundException(){
+        return  problemDetailConfig(HttpStatus.BAD_REQUEST,
+                "Client not found!",
+                "http://localhost:8081/api/v1/client");
+    }
 }
