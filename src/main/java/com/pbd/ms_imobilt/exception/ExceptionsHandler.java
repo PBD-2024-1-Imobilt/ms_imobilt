@@ -56,4 +56,10 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
                 "Client not found!",
                 "http://localhost:8081/api/v1/client");
     }
+
+    @ExceptionHandler(DuplicateLoteClientException.class)
+    public ProblemDetail duplicateLoteClientException(DuplicateLoteClientException e){
+        return problemDetailConfig(HttpStatus.BAD_REQUEST,
+               e.getMessage(), "http://localhost:8081/api/v1/lote");
+    }
 }

@@ -38,6 +38,10 @@ public class LoteService {
         return loteRepository.findByDescriptionAndBlock(description, block);
     }
 
+    public Optional<Lote> findByIDService(int id){
+        return loteRepository.findById(id);
+    }
+
     private LoteRespDto formatterLote(Lote lote) {
         Block block = blockRepository.findById(lote.getBlock().getId()).get();
 

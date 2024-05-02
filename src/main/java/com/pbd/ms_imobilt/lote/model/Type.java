@@ -1,4 +1,4 @@
-package com.pbd.ms_imobilt.loteclient.model;
+package com.pbd.ms_imobilt.lote.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

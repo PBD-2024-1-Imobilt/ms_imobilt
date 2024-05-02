@@ -1,4 +1,4 @@
-package com.pbd.ms_imobilt.loteclient.dto;
+package com.pbd.ms_imobilt.lote.dto;
 
 import jakarta.validation.constraints.NotNull;
 
