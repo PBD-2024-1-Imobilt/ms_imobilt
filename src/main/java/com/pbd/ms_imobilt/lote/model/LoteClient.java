@@ -1,7 +1,6 @@
-package com.pbd.ms_imobilt.loteclient.model;
+package com.pbd.ms_imobilt.lote.model;
 
 import com.pbd.ms_imobilt.client.model.Client;
-import com.pbd.ms_imobilt.lote.model.Lote;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +24,7 @@ public class LoteClient{
     @JoinColumn(name = "lote_id")
     private Lote lote;
 
+    @Enumerated(EnumType.STRING)
     private Type type;
 
     @Column(name = "create_at")

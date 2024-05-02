@@ -1,10 +1,10 @@
 package com.pbd.ms_imobilt.client.controller;
 
 import com.pbd.ms_imobilt.client.dto.ClientReqDto;
-import com.pbd.ms_imobilt.client.dto.ClientRespDto;
 import com.pbd.ms_imobilt.client.model.Client;
 import com.pbd.ms_imobilt.client.service.ClientService;
 import com.pbd.ms_imobilt.exception.ClientNotFoundException;
+import com.pbd.ms_imobilt.responsedefault.RespIdDefaultDto;
 import com.pbd.ms_imobilt.token.model.TokenHearder;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ public class ClientController {
     private ClientService clientService;
 
     @PostMapping
-    public ResponseEntity<ClientRespDto> postCreateClient(
+    public ResponseEntity<RespIdDefaultDto> postCreateClient(
             @RequestHeader(name = "token") String tokenHeader,
             @RequestBody @Valid ClientReqDto clientReqDto
             ){
@@ -36,12 +36,12 @@ public class ClientController {
         client = clientService.saveService(client);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ClientRespDto(client.getId()));
+                .body(new RespIdDefaultDto(client.getId()));
 
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<ClientRespDto> putEditClient(@PathVariable(value = "id") Integer id,
+    public ResponseEntity<RespIdDefaultDto> putEditClient(@PathVariable(value = "id") Integer id,
                                                 @RequestHeader(name = "token") String tokenHeader,
                                                 @RequestBody ClientReqDto clientReqDto){
 
@@ -55,7 +55,7 @@ public class ClientController {
         Client editedClient = clientService.saveService(oldClient.get());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ClientRespDto(
+                .body(new RespIdDefaultDto(
                        editedClient.getId()
                 ));
 
