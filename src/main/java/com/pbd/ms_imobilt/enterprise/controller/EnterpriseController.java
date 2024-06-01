@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,17 +71,18 @@ public class EnterpriseController {
 
         if (validateBlocksError.isEmpty()){
             Enterprise enterprise = enterpriseService.getEnterpriseByIDService(enterpriseId);
-            for (InputBlocksAndLotesReqDto blockAndLotes: listBlocks){
+            for (InputBlocksAndLotesReqDto itemBlock: listBlocks){
+
                 Block block = new Block();
 
-                BeanUtils.copyProperties(new BlockReqDto(enterprise, blockAndLotes.description()), block);
+                BeanUtils.copyProperties(new BlockReqDto(enterprise, itemBlock.description()), block);
 
-                Optional<Block> blockExists = blockService.findByDescriptionService(blockAndLotes.description());
+                Optional<Block> blockExists = blockService.findByDescriptionService(itemBlock.description());
 
                 block = blockExists.isPresent() ? blockExists.get():
                         blockService.saveService(block);
 
-                for (InputLoteReqDto inputLote: blockAndLotes.lotes()){
+                for (InputLoteReqDto inputLote: itemBlock.lotes()){
                     Lote lote = new Lote();
 
                     BeanUtils.copyProperties(new LoteReqDto(block, inputLote.description()), lote);

@@ -8,6 +8,7 @@ import com.pbd.ms_imobilt.responsedefault.RespIdDefaultDto;
 import com.pbd.ms_imobilt.token.model.TokenHearder;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +53,9 @@ public class ClientController {
 
         BeanUtils.copyProperties(clientReqDto, oldClient.get());
 
-        Client editedClient = clientService.saveService(oldClient.get());
+        Client editedClient = clientService.saveService(
+                oldClient.get()
+        );
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new RespIdDefaultDto(
