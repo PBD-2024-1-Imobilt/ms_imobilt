@@ -26,7 +26,7 @@ public class BlockService {
 
     @Transactional
     public Block saveService(Block block){
-        if (authToken.tokenHearderValidation(TokenHearder.token))
+        if (authToken.validateToken(TokenHearder.token))
             return blockRepository.save(block);
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }

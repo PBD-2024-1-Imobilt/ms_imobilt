@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,16 +28,20 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("api/v1/lote")
-@AllArgsConstructor
 public class LoteController {
 
-    private final LoteService loteService;
-    private final ClientService clientService;
-    private final LoteClientService loteClientService;
+    @Autowired
+    private  LoteService loteService;
+
+    @Autowired
+    private  ClientService clientService;
+
+    @Autowired
+    private  LoteClientService loteClientService;
 
     @GetMapping()
     public ResponseEntity<Map<String, List<LoteRespDto>>> getAllLotes(@RequestHeader("token") String tokenHearder){
-        TokenHearder.setToken(tokenHearder);
+        TokenHearder.token = tokenHearder;
         return ResponseEntity.ok(loteService.getAllLotesService());
     }
 
@@ -46,7 +51,7 @@ public class LoteController {
             @PathVariable(value = "id_lote") Integer id_lote,
             @RequestBody @Valid InputReqLoteClientDto clientID
             ){
-        TokenHearder.setToken(tokenHeader);
+        TokenHearder.token = tokenHeader;
 
         var client = clientService.findByIdService(clientID.client_id()).get();
 
@@ -54,7 +59,7 @@ public class LoteController {
 
         if (!loteClientService.isLoteClientExists(
                 client, lote, Type.RESERVE)){
-            return loteClientService.executeSaveService(
+            return loteClientService.saveService(
                     client, lote, Type.RESERVE
             );
         }
@@ -69,7 +74,7 @@ public class LoteController {
             @PathVariable(value = "id_lote") Integer id_lote,
             @RequestBody @Valid InputReqLoteClientDto clientID
             ){
-        TokenHearder.setToken(tokenHeader);
+        TokenHearder.token = tokenHeader;
 
         var client = clientService.findByIdService(clientID.client_id()).get();
 
@@ -78,7 +83,7 @@ public class LoteController {
         if (!loteClientService.isLoteClientExists(
                 client, lote, Type.SALE)){
 
-            return loteClientService.executeSaveService(
+            return loteClientService.saveService(
                     client, lote, Type.SALE
             );
 
