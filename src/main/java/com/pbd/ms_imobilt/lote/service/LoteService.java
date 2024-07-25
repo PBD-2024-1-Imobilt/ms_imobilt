@@ -4,8 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+import com.pbd.ms_imobilt.configuration.TemplateConfig;
 import com.pbd.ms_imobilt.token.model.TokenHearder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,25 +18,20 @@ import org.springframework.web.client.HttpClientErrorException;
 import com.pbd.ms_imobilt.lote.dto.LoteRespDto;
 import com.pbd.ms_imobilt.token.service.TokenAuthenticationService;
 import com.pbd.ms_imobilt.block.model.Block;
-import com.pbd.ms_imobilt.enterprise.model.Enterprise;
 import com.pbd.ms_imobilt.lote.model.Lote;
-import com.pbd.ms_imobilt.block.repository.BlockRepositoryI;
-import com.pbd.ms_imobilt.enterprise.repository.EnterpriseRepositoryI;
 import com.pbd.ms_imobilt.lote.repository.LoteRepositoryI;
 
-import lombok.AllArgsConstructor;
-
 @Service
-@AllArgsConstructor
 public class LoteService {
 
-    private final LoteRepositoryI loteRepository;
+    @Autowired
+    private  LoteRepositoryI loteRepository;
 
-    private final BlockRepositoryI blockRepository;
+    @Autowired
+    private  TokenAuthenticationService authToken;
 
-    private final EnterpriseRepositoryI enterpriseRepository;
-
-    private final TokenAuthenticationService authToken;
+    @Autowired
+    private TemplateConfig templateConfig;
 
     public Optional<Lote> findByDescriptionAndBlockService(String description, Block block){
         return loteRepository.findByDescriptionAndBlock(description, block);
@@ -42,21 +41,7 @@ public class LoteService {
         return loteRepository.findById(id);
     }
 
-    private LoteRespDto formatterLote(Lote lote) {
-        Block block = blockRepository.findById(lote.getBlock().getId()).get();
 
-        Enterprise enterprise = enterpriseRepository.findById(
-                block.getEnterprise().getId()
-        ).get();
-
-        return  new LoteRespDto(
-                lote.getId(),
-                lote.getDescription(),
-                enterprise,
-                block.getDescription()
-        );
-
-    }
 
     public Map<String, List<LoteRespDto>> getAllLotesService(){
         Map<String, List<LoteRespDto>> map = new HashMap<>();
@@ -64,8 +49,8 @@ public class LoteService {
                 "response", loteRepository
                         .findAll()
                         .stream()
-                        .filter(e -> authToken.tokenHearderValidation(TokenHearder.token))
-                        .map(this::formatterLote)
+                        .filter(lote -> authToken.validateToken(TokenHearder.token))
+                        .map(lote -> templateConfig.formatterLote(lote))
                         .toList()
         );
 
@@ -76,9 +61,11 @@ public class LoteService {
     }
 
     @Transactional
-    public Lote saveLoteService(Lote lote){
-        if (authToken.tokenHearderValidation(TokenHearder.token))
-            return loteRepository.save(lote);
+    public void saveLoteService(Lote lote){
+        if (authToken.validateToken(TokenHearder.token)) {
+            loteRepository.save(lote);
+            return;
+        }
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
 }

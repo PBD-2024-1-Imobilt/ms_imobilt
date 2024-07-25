@@ -24,7 +24,7 @@ public class EnterpriseService {
 
     @Transactional
     public Enterprise saveService(Enterprise enterprise){
-        if (authToken.tokenHearderValidation(TokenHearder.token))
+        if (authToken.validateToken(TokenHearder.token))
             return enterpriseRepository.save(enterprise);
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }

@@ -1,5 +1,7 @@
 package com.pbd.ms_imobilt.exception;
 
+import com.pbd.ms_imobilt.configuration.ExceptionConfigs;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.*;
 import org.springframework.validation.FieldError;
@@ -16,14 +18,8 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
-    private ProblemDetail problemDetailConfig(HttpStatus httpStatus, String error, String uri){
-        ProblemDetail problemDetail = ProblemDetail.forStatus(httpStatus);
-        problemDetail.setTitle(error);
-        problemDetail.setType(
-                URI.create(uri)
-        );
-        return problemDetail;
-    }
+    @Autowired
+    private ExceptionConfigs exceptionConfigs;
 
     @SuppressWarnings("null")
     @Override
@@ -44,7 +40,7 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(HttpClientErrorException.class)
     public ProblemDetail invalidTokenException(){
-        return problemDetailConfig(HttpStatus.UNAUTHORIZED,
+        return exceptionConfigs.problemDetailConfig(HttpStatus.UNAUTHORIZED,
                 "Authorization denied: Invalid token",
                 "http://localhost:8081/api/v1/lotes"
                 );
@@ -52,14 +48,16 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ClientNotFoundException.class)
     public ProblemDetail clientNotFoundException(){
-        return  problemDetailConfig(HttpStatus.BAD_REQUEST,
+        return  exceptionConfigs.problemDetailConfig(HttpStatus.BAD_REQUEST,
                 "Client not found!",
                 "http://localhost:8081/api/v1/client");
     }
 
     @ExceptionHandler(DuplicateLoteClientException.class)
     public ProblemDetail duplicateLoteClientException(DuplicateLoteClientException e){
-        return problemDetailConfig(HttpStatus.BAD_REQUEST,
+        return exceptionConfigs.problemDetailConfig(HttpStatus.BAD_REQUEST,
                e.getMessage(), "http://localhost:8081/api/v1/lote");
     }
+
+
 }

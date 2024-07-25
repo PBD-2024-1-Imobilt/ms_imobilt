@@ -25,7 +25,7 @@ public class ClientService {
 
     @Transactional
     public Client saveService(Client client){
-        if (authToken.tokenHearderValidation(TokenHearder.token))
+        if (authToken.validateToken(TokenHearder.token))
             return clientRepositoryI.save(client);
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }

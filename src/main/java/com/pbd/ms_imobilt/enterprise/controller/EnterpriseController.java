@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.pbd.ms_imobilt.token.dto.TokenRequestDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,7 @@ public class EnterpriseController {
     @PostMapping
     public ResponseEntity<EnterpriseRespDto> postCreateEnterprise(@RequestHeader(name = "token") String tokenHeader,
                                                                   @RequestBody @Valid EnterpriseReqDto requestBody){
-        TokenHearder.setToken(tokenHeader);
+        TokenHearder.token = tokenHeader;
         Enterprise enterprise = new Enterprise();
         BeanUtils.copyProperties(requestBody, enterprise);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -65,7 +66,7 @@ public class EnterpriseController {
             @PathVariable(name = "enterprise_id") Integer enterpriseId ,
             @RequestBody  @Valid List<InputBlocksAndLotesReqDto> listBlocks){
 
-        TokenHearder.setToken(tokenHeader);
+        TokenHearder.token = tokenHeader;
 
         List<String> validateBlocksError = validationService.validateBlocks(listBlocks);
 

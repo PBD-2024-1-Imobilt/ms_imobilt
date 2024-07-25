@@ -21,7 +21,7 @@ public class ValidationService {
     private final TokenAuthenticationService authToken;
 
     public List<String> validateBlocks(List<InputBlocksAndLotesReqDto> listBlocks){
-        if (authToken.tokenHearderValidation(TokenHearder.token)){
+        if (authToken.validateToken(TokenHearder.token)){
             List<String> erros = new ArrayList<>(),
                     blocks = new ArrayList<>(),
                     lotes = new ArrayList<>();

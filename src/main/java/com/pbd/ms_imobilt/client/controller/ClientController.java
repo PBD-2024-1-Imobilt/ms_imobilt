@@ -28,7 +28,7 @@ public class ClientController {
             @RequestHeader(name = "token") String tokenHeader,
             @RequestBody @Valid ClientReqDto clientReqDto
             ){
-        TokenHearder.setToken(tokenHeader);
+        TokenHearder.token = tokenHeader;
 
         Client client = new Client();
 
@@ -46,7 +46,7 @@ public class ClientController {
                                                 @RequestHeader(name = "token") String tokenHeader,
                                                 @RequestBody ClientReqDto clientReqDto){
 
-        TokenHearder.setToken(tokenHeader);
+        TokenHearder.token = tokenHeader;
 
         Optional<Client> oldClient = Optional.ofNullable(clientService.findByIdService(id)
                 .orElseThrow(ClientNotFoundException::new));
