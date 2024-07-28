@@ -8,6 +8,7 @@ import java.util.List;
 
 public record InputBlocksAndLotesReqDto(
         @NotBlank
+        @NotNull
         String description,
 
         @NotNull

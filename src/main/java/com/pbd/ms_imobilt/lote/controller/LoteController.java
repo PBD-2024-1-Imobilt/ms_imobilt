@@ -4,15 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
+import com.pbd.ms_imobilt.lote.model.LoteClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.pbd.ms_imobilt.client.service.ClientService;
 import com.pbd.ms_imobilt.exception.DuplicateLoteClientException;
@@ -47,7 +43,7 @@ public class LoteController {
 
     @PostMapping("{id_lote}/reserve")
     public ResponseEntity<RespIdDefaultDto> postLoteReserve(
-            @RequestHeader("token") String tokenHeader,
+            @RequestHeader(TokenHearder.TOKENNAME) String tokenHeader,
             @PathVariable(value = "id_lote") Integer id_lote,
             @RequestBody @Valid InputReqLoteClientDto clientID
             ){
@@ -70,7 +66,7 @@ public class LoteController {
 
     @PostMapping("{id_lote}/sale")
     public ResponseEntity<RespIdDefaultDto> postLoteSale(
-            @RequestHeader("token") String tokenHeader,
+            @RequestHeader(TokenHearder.TOKENNAME) String tokenHeader,
             @PathVariable(value = "id_lote") Integer id_lote,
             @RequestBody @Valid InputReqLoteClientDto clientID
             ){
@@ -91,5 +87,15 @@ public class LoteController {
 
         throw new DuplicateLoteClientException("O cliente já tem uma venda para esse lote criado em %s"
                 .formatted(LocalDateTime.now()));
+    }
+
+    @PutMapping("{id_lote}/cancel")
+    public void putLoteClientCancel(
+            @PathVariable Integer id_lote,
+            @RequestHeader(TokenHearder.TOKENNAME) String tokenHeader,
+            @RequestBody ObservationReqDto observationReqDto
+    ) {
+
+//        LoteClient loteClient = loteClientService.findByIdService(id_loi);
     }
 }

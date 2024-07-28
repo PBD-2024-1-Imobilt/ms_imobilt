@@ -1,6 +1,10 @@
 package com.pbd.ms_imobilt.exception;
 
 import com.pbd.ms_imobilt.configuration.ExceptionConfigs;
+
+import jakarta.validation.ValidationException;
+
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.*;

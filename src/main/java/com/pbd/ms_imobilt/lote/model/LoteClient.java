@@ -4,11 +4,13 @@ import com.pbd.ms_imobilt.client.model.Client;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@ToString
 @Entity
 @Table(name = "lote_client")
 public class LoteClient{

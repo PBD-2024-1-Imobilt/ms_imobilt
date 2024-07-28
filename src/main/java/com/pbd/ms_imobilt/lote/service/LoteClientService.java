@@ -28,6 +28,11 @@ public class LoteClientService {
     @Autowired
     private  TokenAuthenticationService authToken;
 
+    public LoteClient findByIdService(Integer id){
+        return loteClientRepository.findLoteClientByLote_Id(id).orElseThrow();
+        // ! Tratar essa exception depois
+    }
+
     @Transactional
     public ResponseEntity<RespIdDefaultDto> saveService(Client client, Lote lote, Type type){
 
@@ -49,4 +54,26 @@ public class LoteClientService {
                     client, lote, type).isPresent();
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
+
+    public ResponseEntity<?> loteClientCancelService(LoteClient loteClient){
+        switch (loteClient.getType()){
+            case SALE:
+                loteClientRepository.loteClientCancel(loteClient.getId());
+            case RESERVE:
+                if (loteClientRepository.deleteLoteClient(loteClient.getId()))
+                    break;
+                // ! isso aqui vai ser uma exception é que no momento a preguiça reina
+                return ResponseEntity.badRequest().body("Failed to delete");
+
+            case CANCEL:
+                // ! isso aqui vai ser uma exception é que no momento a preguiça reina
+                return ResponseEntity.badRequest().body("this field is required");
+        }
+        return ResponseEntity.ok(
+                new RespIdDefaultDto(loteClient.getId())
+        );
+
+    }
+
+
 }
