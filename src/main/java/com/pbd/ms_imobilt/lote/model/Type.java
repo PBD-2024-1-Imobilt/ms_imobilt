@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum Type {
 
     RESERVE("RESERVE"),
-    SALE("SALE");
+    SALE("SALE"),
+    CANCEL("CANCEL");
 
     private final String value;
 }
