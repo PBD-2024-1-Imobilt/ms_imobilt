@@ -12,13 +12,14 @@ import java.util.Optional;
 
 public interface LoteClientRepository extends JpaRepository<LoteClient, Integer> {
 
-    Optional<LoteClient> findLoteClientByLote_Id(Integer id);
+    Optional<LoteClient> findByLote(Lote lote);
 
     Optional<LoteClient> findByClientAndLoteAndType(Client client, Lote lote, Type type);
 
     @Modifying
-    @Query(value = "UPDATE lote_client SET type = 'CANCEL' WHERE id = ?1", nativeQuery = true)
-    void loteClientCancel(Integer id);
+    @Query(value = "UPDATE lote_client SET type = 'CANCEL', observation = :observation WHERE id = :id",
+            nativeQuery = true)
+    void loteClientCancel(Integer id, String observation);
 
-    boolean deleteLoteClient(Integer id);
+    boolean deleteLoteClientById(Integer id);
 }

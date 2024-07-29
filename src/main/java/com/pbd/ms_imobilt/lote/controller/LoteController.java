@@ -4,9 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.pbd.ms_imobilt.exception.ObservationFieldException;
 import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
+import com.pbd.ms_imobilt.lote.model.Lote;
 import com.pbd.ms_imobilt.lote.model.LoteClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +23,6 @@ import com.pbd.ms_imobilt.lote.service.LoteService;
 import com.pbd.ms_imobilt.responsedefault.RespIdDefaultDto;
 import com.pbd.ms_imobilt.token.model.TokenHearder;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("api/v1/lote")
@@ -51,7 +53,7 @@ public class LoteController {
 
         var client = clientService.findByIdService(clientID.client_id()).get();
 
-        var lote = loteService.findByIDService(id_lote).get();
+        var lote = loteService.findByIDService(id_lote);
 
         if (!loteClientService.isLoteClientExists(
                 client, lote, Type.RESERVE)){
@@ -74,7 +76,7 @@ public class LoteController {
 
         var client = clientService.findByIdService(clientID.client_id()).get();
 
-        var lote = loteService.findByIDService(id_lote).get();
+        var lote = loteService.findByIDService(id_lote);
 
         if (!loteClientService.isLoteClientExists(
                 client, lote, Type.SALE)){
@@ -90,12 +92,20 @@ public class LoteController {
     }
 
     @PutMapping("{id_lote}/cancel")
-    public void putLoteClientCancel(
+    public ResponseEntity<RespIdDefaultDto> putLoteClientCancel(
             @PathVariable Integer id_lote,
             @RequestHeader(TokenHearder.TOKENNAME) String tokenHeader,
             @RequestBody ObservationReqDto observationReqDto
     ) {
+        TokenHearder.token = tokenHeader;
 
-//        LoteClient loteClient = loteClientService.findByIdService(id_loi);
+        Lote lote = loteService.findByIDService(id_lote);
+
+        LoteClient loteClientOld = loteClientService.findByLoteService(lote);
+        
+        if (loteClientOld.getType() == Type.SALE && observationReqDto.observation().isEmpty())
+                throw new ObservationFieldException("When the type of LoteClient is SALE, this field is mandatory!",
+                        HttpStatus.BAD_REQUEST);
+        return loteClientService.loteClientCancelService(loteClientOld, observationReqDto);
     }
 }

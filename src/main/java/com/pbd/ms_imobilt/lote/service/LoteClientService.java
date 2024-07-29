@@ -1,7 +1,11 @@
 package com.pbd.ms_imobilt.lote.service;
 
 import com.pbd.ms_imobilt.client.model.Client;
+import com.pbd.ms_imobilt.exception.LoteCiientCancelException;
+import com.pbd.ms_imobilt.exception.LoteClientFailedDeleteException;
+import com.pbd.ms_imobilt.exception.LoteClientNotFound;
 import com.pbd.ms_imobilt.lote.dto.LoteClientReqDto;
+import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
 import com.pbd.ms_imobilt.lote.model.Lote;
 import com.pbd.ms_imobilt.lote.model.LoteClient;
 import com.pbd.ms_imobilt.lote.model.Type;
@@ -28,9 +32,10 @@ public class LoteClientService {
     @Autowired
     private  TokenAuthenticationService authToken;
 
-    public LoteClient findByIdService(Integer id){
-        return loteClientRepository.findLoteClientByLote_Id(id).orElseThrow();
-        // ! Tratar essa exception depois
+    public LoteClient findByLoteService(Lote lote){
+        return loteClientRepository.findByLote(lote)
+                .orElseThrow(() -> new LoteClientNotFound("LoteClient not found!",
+                        HttpStatus.BAD_REQUEST));
     }
 
     @Transactional
@@ -55,24 +60,25 @@ public class LoteClientService {
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
 
-    public ResponseEntity<?> loteClientCancelService(LoteClient loteClient){
-        switch (loteClient.getType()){
-            case SALE:
-                loteClientRepository.loteClientCancel(loteClient.getId());
-            case RESERVE:
-                if (loteClientRepository.deleteLoteClient(loteClient.getId()))
+    public ResponseEntity<RespIdDefaultDto> loteClientCancelService(LoteClient loteClient, ObservationReqDto observartion){
+        if (authToken.validateToken(TokenHearder.token)){
+            switch (loteClient.getType()){
+                case SALE:
+                    loteClientRepository.loteClientCancel(loteClient.getId(), observartion.observation());
                     break;
-                // ! isso aqui vai ser uma exception é que no momento a preguiça reina
-                return ResponseEntity.badRequest().body("Failed to delete");
-
-            case CANCEL:
-                // ! isso aqui vai ser uma exception é que no momento a preguiça reina
-                return ResponseEntity.badRequest().body("this field is required");
+                case RESERVE:
+                    if (loteClientRepository.deleteLoteClientById(loteClient.getId()))
+                        break;
+                    throw new LoteClientFailedDeleteException("Failed to delete", HttpStatus.INTERNAL_SERVER_ERROR);
+                case CANCEL:
+                    throw new LoteCiientCancelException("This loteClient has already been cancelled",
+                            HttpStatus.BAD_REQUEST);
+            }
+            return ResponseEntity.ok(
+                    new RespIdDefaultDto(loteClient.getId())
+            );
         }
-        return ResponseEntity.ok(
-                new RespIdDefaultDto(loteClient.getId())
-        );
-
+        throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
 
 

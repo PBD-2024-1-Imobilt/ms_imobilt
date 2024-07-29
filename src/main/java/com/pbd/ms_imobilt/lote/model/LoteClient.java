@@ -32,4 +32,7 @@ public class LoteClient{
     @Column(name = "create_at")
     private LocalDateTime createAt;
 
+    @Column(name = "observation")
+    private String observation;
+
 }

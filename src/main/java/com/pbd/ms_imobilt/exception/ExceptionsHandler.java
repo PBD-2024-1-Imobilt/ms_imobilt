@@ -46,7 +46,7 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail invalidTokenException(){
         return exceptionConfigs.problemDetailConfig(HttpStatus.UNAUTHORIZED,
                 "Authorization denied: Invalid token",
-                "http://localhost:8081/api/v1/lotes"
+                "http://localhost:8081/api/v1"
                 );
     }
 
@@ -61,6 +61,15 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail duplicateLoteClientException(DuplicateLoteClientException e){
         return exceptionConfigs.problemDetailConfig(HttpStatus.BAD_REQUEST,
                e.getMessage(), "http://localhost:8081/api/v1/lote");
+    }
+
+    @ExceptionHandler(LoteException.class)
+    public ProblemDetail loteException(LoteException e){
+        return exceptionConfigs.problemDetailConfig(
+                e.getHttpStatus(),
+                e.getMessage(),
+                "http://localhost:8081/api/v1/lote"
+                );
     }
 
 
