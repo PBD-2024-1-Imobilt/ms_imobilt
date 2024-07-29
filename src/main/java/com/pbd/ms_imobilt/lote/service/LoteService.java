@@ -8,6 +8,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.pbd.ms_imobilt.configuration.TemplateConfig;
+import com.pbd.ms_imobilt.exception.LoteNotFoundException;
 import com.pbd.ms_imobilt.token.model.TokenHearder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,8 +38,10 @@ public class LoteService {
         return loteRepository.findByDescriptionAndBlock(description, block);
     }
 
-    public Optional<Lote> findByIDService(int id){
-        return loteRepository.findById(id);
+    public Lote findByIDService(int id){
+        return loteRepository.findById(id).orElseThrow(
+                () -> new LoteNotFoundException("Lote not found !", HttpStatus.BAD_REQUEST)
+        );
     }
 
 
