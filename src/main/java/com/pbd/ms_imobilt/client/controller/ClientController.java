@@ -6,6 +6,7 @@ import com.pbd.ms_imobilt.client.service.ClientService;
 import com.pbd.ms_imobilt.exception.ClientNotFoundException;
 import com.pbd.ms_imobilt.responsedefault.RespIdDefaultDto;
 import com.pbd.ms_imobilt.token.model.TokenHearder;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +24,7 @@ public class ClientController {
 
     private ClientService clientService;
 
+    @Operation(summary = "Create Client", description = "Method that creates a client", tags = "Client")
     @PostMapping
     public ResponseEntity<RespIdDefaultDto> postCreateClient(
             @RequestHeader(name = "token") String tokenHeader,
@@ -41,6 +43,7 @@ public class ClientController {
 
     }
 
+    @Operation(summary = "Edit Client", description = "Method to edit a client", tags = "Client")
     @PutMapping("{id}")
     public ResponseEntity<RespIdDefaultDto> putEditClient(@PathVariable(value = "id") Integer id,
                                                 @RequestHeader(name = "token") String tokenHeader,
