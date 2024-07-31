@@ -8,6 +8,7 @@ import com.pbd.ms_imobilt.exception.ObservationFieldException;
 import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
 import com.pbd.ms_imobilt.lote.model.Lote;
 import com.pbd.ms_imobilt.lote.model.LoteClient;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +38,14 @@ public class LoteController {
     @Autowired
     private  LoteClientService loteClientService;
 
+    @Operation(summary = "List Lote", description = "Method to list lotes", tags = "Lote")
     @GetMapping()
     public ResponseEntity<Map<String, List<LoteRespDto>>> getAllLotes(@RequestHeader("token") String tokenHearder){
         TokenHearder.token = tokenHearder;
         return ResponseEntity.ok(loteService.getAllLotesService());
     }
 
+    @Operation(summary = "Lote Reserve", description = "Method to reserve a lote", tags = "Lote")
     @PostMapping("{id_lote}/reserve")
     public ResponseEntity<RespIdDefaultDto> postLoteReserve(
             @RequestHeader(TokenHearder.TOKENNAME) String tokenHeader,
@@ -66,6 +69,7 @@ public class LoteController {
                 .formatted(LocalDateTime.now()));
     }
 
+    @Operation(summary = "Lote Sale", description = "Method for selling a lote", tags = "Lote")
     @PostMapping("{id_lote}/sale")
     public ResponseEntity<RespIdDefaultDto> postLoteSale(
             @RequestHeader(TokenHearder.TOKENNAME) String tokenHeader,
@@ -91,6 +95,7 @@ public class LoteController {
                 .formatted(LocalDateTime.now()));
     }
 
+    @Operation(summary = "Lote Cancel", description = "Method to cancel a lote", tags = "Lote")
     @PutMapping("{id_lote}/cancel")
     public ResponseEntity<RespIdDefaultDto> putLoteClientCancel(
             @PathVariable Integer id_lote,
@@ -104,7 +109,7 @@ public class LoteController {
         LoteClient loteClientOld = loteClientService.findByLoteService(lote);
         
         if (loteClientOld.getType() == Type.SALE && observationReqDto.observation().isEmpty())
-                throw new ObservationFieldException("When the type of LoteClient is SALE, this field is mandatory!",
+                throw new ObservationFieldException("When the previous LotClient type is SALE, this field is mandatory!",
                         HttpStatus.BAD_REQUEST);
         return loteClientService.loteClientCancelService(loteClientOld, observationReqDto);
     }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.pbd.ms_imobilt.token.dto.TokenRequestDto;
+import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,7 @@ public class EnterpriseController {
     private final ValidationService validationService;
 
     @PostMapping
+    @Operation(summary = "Create Enterprise", description = "Method for creating enterprises", tags = "Enterprise")
     public ResponseEntity<EnterpriseRespDto> postCreateEnterprise(@RequestHeader(name = "token") String tokenHeader,
                                                                   @RequestBody @Valid EnterpriseReqDto requestBody){
         TokenHearder.token = tokenHeader;
@@ -60,6 +62,7 @@ public class EnterpriseController {
         );
     }
 
+    @Operation(summary = "Create Blocks", description = "Method for creating blocks", tags = "Enterprise")
     @PostMapping("{enterprise_id}/blocks")
     public ResponseEntity<?> postCreateBlocks(
             @RequestHeader(name = "token") String tokenHeader,
