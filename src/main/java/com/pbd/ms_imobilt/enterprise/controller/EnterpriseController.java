@@ -4,9 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import com.pbd.ms_imobilt.token.dto.TokenRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +55,7 @@ public class EnterpriseController {
         BeanUtils.copyProperties(requestBody, enterprise);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new EnterpriseRespDto(
-                        enterpriseService.saveService(enterprise).getId()
+                        enterpriseService.save(enterprise).getId()
                 )
         );
     }
@@ -74,25 +72,25 @@ public class EnterpriseController {
         List<String> validateBlocksError = validationService.validateBlocks(listBlocks);
 
         if (validateBlocksError.isEmpty()){
-            Enterprise enterprise = enterpriseService.getEnterpriseByIDService(enterpriseId);
+            Enterprise enterprise = enterpriseService.getEnterpriseByID(enterpriseId);
             for (InputBlocksAndLotesReqDto itemBlock: listBlocks){
 
                 Block block = new Block();
 
                 BeanUtils.copyProperties(new BlockReqDto(enterprise, itemBlock.description()), block);
 
-                Optional<Block> blockExists = blockService.findByDescriptionService(itemBlock.description());
+                Optional<Block> blockExists = blockService.findByDescription(itemBlock.description());
 
                 block = blockExists.isPresent() ? blockExists.get():
-                        blockService.saveService(block);
+                        blockService.save(block);
 
                 for (InputLoteReqDto inputLote: itemBlock.lotes()){
                     Lote lote = new Lote();
 
                     BeanUtils.copyProperties(new LoteReqDto(block, inputLote.description()), lote);
 
-                    if (loteService.findByDescriptionAndBlockService(inputLote.description(), block).isEmpty())
-                        loteService.saveLoteService(lote);
+                    if (loteService.findByDescriptionAndBlock(inputLote.description(), block).isEmpty())
+                        loteService.saveLote(lote);
                 }
             }
 

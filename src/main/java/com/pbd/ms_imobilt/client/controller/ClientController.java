@@ -9,7 +9,6 @@ import com.pbd.ms_imobilt.token.model.TokenHearder;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class ClientController {
 
         BeanUtils.copyProperties(clientReqDto, client);
 
-        client = clientService.saveService(client);
+        client = clientService.save(client);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new RespIdDefaultDto(client.getId()));
@@ -51,12 +50,12 @@ public class ClientController {
 
         TokenHearder.token = tokenHeader;
 
-        Optional<Client> oldClient = Optional.ofNullable(clientService.findByIdService(id)
+        Optional<Client> oldClient = Optional.ofNullable(clientService.findById(id)
                 .orElseThrow(ClientNotFoundException::new));
 
         BeanUtils.copyProperties(clientReqDto, oldClient.get());
 
-        Client editedClient = clientService.saveService(
+        Client editedClient = clientService.save(
                 oldClient.get()
         );
 

@@ -19,12 +19,12 @@ public class ClientService {
     private ClientRepositoryI clientRepositoryI;
     private TokenAuthenticationService authToken;
 
-    public Optional<Client> findByIdService(Integer id){
+    public Optional<Client> findById(Integer id){
         return clientRepositoryI.findById(id);
     }
 
     @Transactional
-    public Client saveService(Client client){
+    public Client save(Client client){
         if (authToken.validateToken(TokenHearder.token))
             return clientRepositoryI.save(client);
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);

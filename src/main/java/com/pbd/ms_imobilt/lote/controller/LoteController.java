@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.pbd.ms_imobilt.client.model.Client;
 import com.pbd.ms_imobilt.exception.ObservationFieldException;
 import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
 import com.pbd.ms_imobilt.lote.model.Lote;
@@ -42,7 +43,7 @@ public class LoteController {
     @GetMapping()
     public ResponseEntity<Map<String, List<LoteRespDto>>> getAllLotes(@RequestHeader("token") String tokenHearder){
         TokenHearder.token = tokenHearder;
-        return ResponseEntity.ok(loteService.getAllLotesService());
+        return ResponseEntity.ok(loteService.getAllLotes());
     }
 
     @Operation(summary = "Lote Reserve", description = "Method to reserve a lote", tags = "Lote")
@@ -51,16 +52,22 @@ public class LoteController {
             @RequestHeader(TokenHearder.TOKENNAME) String tokenHeader,
             @PathVariable(value = "id_lote") Integer id_lote,
             @RequestBody @Valid InputReqLoteClientDto clientID
-            ){
+    ){
         TokenHearder.token = tokenHeader;
 
-        var client = clientService.findByIdService(clientID.client_id()).get();
+        var client = clientService.findById(clientID.client_id()).get();
 
-        var lote = loteService.findByIDService(id_lote);
+        var lote = loteService.findByID(id_lote);
 
         if (!loteClientService.isLoteClientExists(
                 client, lote, Type.RESERVE)){
-            return loteClientService.saveService(
+            if (loteClientService.existsByLote(lote)){
+                LoteClient loteClient = loteClientService.findByLote(lote);
+                return loteClientService.save(
+                        loteClient.getId(), client, lote, Type.RESERVE
+                );
+            }
+            return loteClientService.save(
                     client, lote, Type.RESERVE
             );
         }
@@ -75,17 +82,21 @@ public class LoteController {
             @RequestHeader(TokenHearder.TOKENNAME) String tokenHeader,
             @PathVariable(value = "id_lote") Integer id_lote,
             @RequestBody @Valid InputReqLoteClientDto clientID
-            ){
+    ){
         TokenHearder.token = tokenHeader;
 
-        var client = clientService.findByIdService(clientID.client_id()).get();
+        Client client = clientService.findById(clientID.client_id()).get();
 
-        var lote = loteService.findByIDService(id_lote);
+        Lote lote = loteService.findByID(id_lote);
 
-        if (!loteClientService.isLoteClientExists(
-                client, lote, Type.SALE)){
-
-            return loteClientService.saveService(
+        if (!loteClientService.isLoteClientExists(client, lote, Type.SALE)){
+            if (loteClientService.existsByLote(lote)){
+                LoteClient loteClient = loteClientService.findByLote(lote);
+                return loteClientService.save(
+                        loteClient.getId(), client, lote, Type.SALE
+                );
+            }
+            return loteClientService.save(
                     client, lote, Type.SALE
             );
 
@@ -104,13 +115,13 @@ public class LoteController {
     ) {
         TokenHearder.token = tokenHeader;
 
-        Lote lote = loteService.findByIDService(id_lote);
+        Lote lote = loteService.findByID(id_lote);
 
-        LoteClient loteClientOld = loteClientService.findByLoteService(lote);
+        LoteClient loteClientOld = loteClientService.findByLote(lote);
         
         if (loteClientOld.getType() == Type.SALE && observationReqDto.observation().isEmpty())
                 throw new ObservationFieldException("When the previous LotClient type is SALE, this field is mandatory!",
                         HttpStatus.BAD_REQUEST);
-        return loteClientService.loteClientCancelService(loteClientOld, observationReqDto);
+        return loteClientService.loteClientCancel(loteClientOld, observationReqDto);
     }
 }

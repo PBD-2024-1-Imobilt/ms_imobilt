@@ -12,6 +12,8 @@ import java.util.Optional;
 
 public interface LoteClientRepository extends JpaRepository<LoteClient, Integer> {
 
+    boolean existsById(Integer id);
+
     Optional<LoteClient> findByLote(Lote lote);
 
     Optional<LoteClient> findByClientAndLoteAndType(Client client, Lote lote, Type type);
@@ -21,5 +23,5 @@ public interface LoteClientRepository extends JpaRepository<LoteClient, Integer>
             nativeQuery = true)
     void loteClientCancel(Integer id, String observation);
 
-    boolean deleteLoteClientById(Integer id);
+    void deleteLoteClientById(Integer id);
 }
