@@ -32,14 +32,20 @@ public class LoteClientService {
     @Autowired
     private  TokenAuthenticationService authToken;
 
-    public LoteClient findByLoteService(Lote lote){
+    public LoteClient findByLote(Lote lote){
         return loteClientRepository.findByLote(lote)
                 .orElseThrow(() -> new LoteClientNotFound("LoteClient not found!",
                         HttpStatus.BAD_REQUEST));
     }
 
+    public LoteClient findByClientAndLote(Client client, Lote lote){
+        return loteClientRepository.findByLote(client, lote)
+                .orElseThrow(() -> new LoteClientNotFound("LoteClient not found!",
+                        HttpStatus.BAD_REQUEST));
+    }
+
     @Transactional
-    public ResponseEntity<RespIdDefaultDto> saveService(Client client, Lote lote, Type type){
+    public ResponseEntity<RespIdDefaultDto> save(Client client, Lote lote, Type type){
 
         LoteClient loteClient = new LoteClient();
 
@@ -52,22 +58,45 @@ public class LoteClientService {
         }
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
+    @Transactional
+    public ResponseEntity<RespIdDefaultDto> save(int id, Client client, Lote lote, Type type){
 
-    public boolean isLoteClientExists(Client client, Lote lote, Type type){
-        if (authToken.validateToken(TokenHearder.token))
-            return loteClientRepository.findByClientAndLoteAndType(
-                    client, lote, type).isPresent();
+        LoteClient loteClient = new LoteClient();
+
+        BeanUtils.copyProperties(new LoteClientReqDto(client, lote, type, LocalDateTime.now()), loteClient);
+        BeanUtils.copyProperties(new RespIdDefaultDto(id), loteClient);
+
+        if (authToken.validateToken(TokenHearder.token)){
+            loteClient = loteClientRepository.save(loteClient);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new RespIdDefaultDto(loteClient.getId()));
+        }
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
 
-    public ResponseEntity<RespIdDefaultDto> loteClientCancelService(LoteClient loteClient, ObservationReqDto observartion){
+    public boolean isLoteClientExists(Client client, Lote lote, Type type){
+        if (authToken.validateToken(TokenHearder.token)) {
+
+            return loteClientRepository.findByClientAndLoteAndType(
+                    client, lote, type).isPresent();
+        }
+        throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+    }
+
+    public boolean existsByLote(Lote lote){
+        return loteClientRepository.findByLote(lote).isPresent();
+    }
+
+    @Transactional
+    public ResponseEntity<RespIdDefaultDto> loteClientCancel(LoteClient loteClient, ObservationReqDto observartion){
         if (authToken.validateToken(TokenHearder.token)){
             switch (loteClient.getType()){
                 case SALE:
                     loteClientRepository.loteClientCancel(loteClient.getId(), observartion.observation());
                     break;
                 case RESERVE:
-                    if (loteClientRepository.deleteLoteClientById(loteClient.getId()))
+                    loteClientRepository.deleteLoteClientById(loteClient.getId());
+                    if (!loteClientRepository.existsById(loteClient.getId()))
                         break;
                     throw new LoteClientFailedDeleteException("Failed to delete", HttpStatus.INTERNAL_SERVER_ERROR);
                 case CANCEL:

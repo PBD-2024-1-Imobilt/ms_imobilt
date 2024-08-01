@@ -20,12 +20,12 @@ public class BlockService {
 
     private final TokenAuthenticationService authToken;
 
-    public Optional<Block> findByDescriptionService(String description){
+    public Optional<Block> findByDescription(String description){
         return blockRepository.findByDescription(description);
     }
 
     @Transactional
-    public Block saveService(Block block){
+    public Block save(Block block){
         if (authToken.validateToken(TokenHearder.token))
             return blockRepository.save(block);
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);

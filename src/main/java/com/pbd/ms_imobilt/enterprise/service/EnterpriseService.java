@@ -18,12 +18,12 @@ public class EnterpriseService {
 
     private final TokenAuthenticationService authToken;
 
-    public Enterprise getEnterpriseByIDService(Integer id){
+    public Enterprise getEnterpriseByID(Integer id){
         return enterpriseRepository.findById(id).get();
     }
 
     @Transactional
-    public Enterprise saveService(Enterprise enterprise){
+    public Enterprise save(Enterprise enterprise){
         if (authToken.validateToken(TokenHearder.token))
             return enterpriseRepository.save(enterprise);
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
