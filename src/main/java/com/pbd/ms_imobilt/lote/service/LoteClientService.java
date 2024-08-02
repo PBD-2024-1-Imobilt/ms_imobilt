@@ -3,9 +3,7 @@ package com.pbd.ms_imobilt.lote.service;
 import com.pbd.ms_imobilt.client.model.Client;
 import com.pbd.ms_imobilt.lote.dto.LoteClientReqDto;
 import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
-import com.pbd.ms_imobilt.lote.exception.LoteCiientCancelException;
-import com.pbd.ms_imobilt.lote.exception.LoteClientFailedDeleteException;
-import com.pbd.ms_imobilt.lote.exception.LoteClientNotFound;
+import com.pbd.ms_imobilt.lote.exception.*;
 import com.pbd.ms_imobilt.lote.model.Lote;
 import com.pbd.ms_imobilt.lote.model.LoteClient;
 import com.pbd.ms_imobilt.lote.model.Type;
@@ -41,59 +39,50 @@ public class LoteClientService {
         return loteClientList;
     }
 
-     public LoteClient findByClientAndLote(Client client, Lote lote){
-         return loteClientRepository.findByClientAndLote(client, lote)
-                 .orElseThrow(() -> new LoteClientNotFound("LoteClient not found!",
-                         HttpStatus.BAD_REQUEST));
-     }
+    public boolean isLoteReservedByAnotherClient(Client client, Lote lote){
+        List<LoteClient> listloteClientReserved = loteClientRepository.findByLote(lote)
+                .stream().filter(l -> l.getType() == Type.RESERVE).toList();
 
-     public boolean isLoteSale(Lote lote){
-         return loteClientRepository.findByLote(lote)
-                 .stream().anyMatch(l -> l.getType() == Type.SALE);
-     }
+        if (!listloteClientReserved.isEmpty()){
+            LoteClient loteClient = listloteClientReserved.stream().findFirst().get();
+            return !loteClient.getClient().getId().equals(client.getId());
+        }
+        return false;
+    }
 
     @Transactional
-    public ResponseEntity<RespIdDefaultDto> save(Client client, Lote lote, Type type){
+    public ResponseEntity<RespIdDefaultDto> save(Client client, Lote lote, Type type) {
 
         LoteClient loteClient = new LoteClient();
 
         BeanUtils.copyProperties(new LoteClientReqDto(client, lote, type, LocalDateTime.now()), loteClient);
 
-        if (authToken.validateToken(TokenHearder.token)){
-            loteClient = loteClientRepository.save(loteClient);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new RespIdDefaultDto(loteClient.getId()));
+        boolean isLoteSale = loteClientRepository.findByLote(lote)
+                .stream().anyMatch(l -> l.getType() == Type.SALE);
+
+        if (isLoteSale)
+            throw new SaleException("This lote already been sold !", HttpStatus.BAD_REQUEST);
+
+        if (loteClientRepository.existsByLoteAndClient(lote, client)) {
+
+            LoteClient loteClientOld = loteClientRepository.findByClientAndLote(client, lote)
+                    .orElseThrow(() -> new LoteClientNotFound("LoteClient not found!",
+                            HttpStatus.BAD_REQUEST));
+
+            if (loteClientOld.getType() == type)
+                throw new DuplicateLoteClientException(
+                        ("Lote already %s by this client in %s")
+                                .formatted(type.getValue(), loteClientOld.getCreateAt()), HttpStatus.BAD_REQUEST);
+
+            BeanUtils.copyProperties(new RespIdDefaultDto(loteClientOld.getId()), loteClient);
         }
-        throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-    }
-    @Transactional
-    public ResponseEntity<RespIdDefaultDto> save(int id, Client client, Lote lote, Type type){
-
-        LoteClient loteClient = new LoteClient();
-
-        BeanUtils.copyProperties(new LoteClientReqDto(client, lote, type, LocalDateTime.now()), loteClient);
-        BeanUtils.copyProperties(new RespIdDefaultDto(id), loteClient);
-
-        if (authToken.validateToken(TokenHearder.token)){
-            loteClient = loteClientRepository.save(loteClient);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new RespIdDefaultDto(loteClient.getId()));
-        }
-        throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-    }
-
-    public boolean isLoteClientExists(Lote lote, Type type){
         if (authToken.validateToken(TokenHearder.token)) {
-
-            return loteClientRepository.findByLoteAndType(lote, type).isPresent();
+            loteClient = loteClientRepository.save(loteClient);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new RespIdDefaultDto(loteClient.getId()));
         }
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
-
-    public boolean existsByLoteAndClient(Lote lote, Client client){
-        return loteClientRepository.findByClientAndLote(client, lote).isPresent();
-    }
-
     @Transactional
     public ResponseEntity<RespIdDefaultDto> loteClientCancel(LoteClient loteClient, ObservationReqDto observartion){
         if (authToken.validateToken(TokenHearder.token)){

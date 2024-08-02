@@ -1,12 +1,11 @@
 package com.pbd.ms_imobilt.lote.controller;
 
-import com.pbd.ms_imobilt.client.exception.DifferentClientException;
 import com.pbd.ms_imobilt.client.model.Client;
 import com.pbd.ms_imobilt.client.service.ClientService;
 import com.pbd.ms_imobilt.lote.dto.InputReqLoteClientDto;
 import com.pbd.ms_imobilt.lote.dto.LoteRespDto;
 import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
-import com.pbd.ms_imobilt.lote.exception.DuplicateLoteClientException;
+import com.pbd.ms_imobilt.lote.exception.LoteCiientCancelException;
 import com.pbd.ms_imobilt.lote.exception.ObservationFieldException;
 import com.pbd.ms_imobilt.lote.exception.SaleException;
 import com.pbd.ms_imobilt.lote.model.Lote;
@@ -25,8 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/v1/lote")
@@ -61,23 +58,7 @@ public class LoteController {
 
         var lote = loteService.findByID(id_lote);
 
-        if (loteClientService.isLoteSale(lote))
-            throw new SaleException("This lote already been sold !", HttpStatus.BAD_REQUEST);
-
-        if (loteClientService.existsByLoteAndClient(lote, client)){
-            LoteClient loteClient = loteClientService.findByClientAndLote(client, lote);
-            switch (loteClient.getType()){
-                case RESERVE -> throw new DuplicateLoteClientException(
-                        ("Lote already reserved by this client in %s")
-                        .formatted(loteClient.getCreateAt()),HttpStatus.BAD_REQUEST);
-                case CANCEL -> {
-                    return loteClientService.save(loteClient.getId(), client, lote, Type.RESERVE);
-                }
-            }
-        }
         return loteClientService.save(client, lote, Type.RESERVE);
-
-
     }
 
     @Operation(summary = "Lote Sale", description = "Method for selling a lote", tags = "Lote")
@@ -93,20 +74,10 @@ public class LoteController {
 
         Lote lote = loteService.findByID(id_lote);
 
-        if (loteClientService.isLoteSale(lote))
-            throw new SaleException("This lote already been sold !", HttpStatus.BAD_REQUEST);
+        if (loteClientService.isLoteReservedByAnotherClient(client, lote))
+            throw new SaleException("Sale of a lot reserved by another client is not allowed",
+                    HttpStatus.BAD_REQUEST);
 
-        if (loteClientService.existsByLoteAndClient(lote, client)){
-            LoteClient loteClient = loteClientService.findByClientAndLote(client, lote);
-            switch (loteClient.getType()){
-                case SALE -> throw new DuplicateLoteClientException(
-                        ("Lote already sold by this client in %s")
-                                .formatted(loteClient.getCreateAt()),HttpStatus.BAD_REQUEST);
-                case CANCEL -> {
-                    return loteClientService.save(loteClient.getId(), client, lote, Type.SALE);
-                }
-            }
-        }
         return loteClientService.save(client, lote, Type.SALE);
     }
 
@@ -120,13 +91,19 @@ public class LoteController {
         TokenHearder.token = tokenHeader;
 
         Lote lote = loteService.findByID(id_lote);
-        return ResponseEntity.ok(new RespIdDefaultDto(0)); //! Retirar isso depois
-        //todo: Arrumar isso quando o prof Heldon responder
-//        LoteClient loteClientOld = loteClientService.findByLote(lote);
-        
-//        if (loteClientOld.getType() == Type.SALE && observationReqDto.observation().isEmpty())
-//                throw new ObservationFieldException("When the previous LotClient type is SALE, this field is mandatory!",
-//                        HttpStatus.BAD_REQUEST);
-//        return loteClientService.loteClientCancel(loteClientOld, observationReqDto);
+
+        LoteClient loteClientOld = loteClientService.findByLote(lote)
+                .stream().filter(
+                        l -> l.getType() == Type.SALE || l.getType() == Type.RESERVE
+                )
+                .findFirst().orElseThrow(
+                        () ->  new LoteCiientCancelException("This loteClient has already been cancelled",
+                                HttpStatus.BAD_REQUEST)
+                );
+
+        if (loteClientOld.getType() == Type.SALE && observationReqDto.observation().isEmpty())
+                throw new ObservationFieldException("When the previous LotClient type is SALE, this field is mandatory!",
+                        HttpStatus.BAD_REQUEST);
+        return loteClientService.loteClientCancel(loteClientOld, observationReqDto);
     }
 }
