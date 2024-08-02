@@ -17,7 +17,7 @@ public interface LoteClientRepository extends JpaRepository<LoteClient, Integer>
 
     Optional<LoteClient> findByClientAndLote(Client client, Lote lote);
 
-    Optional<LoteClient> findByLoteAndType(Lote lote, Type type);
+    boolean existsByLoteAndClient(Lote lote, Client client);
 
     @Modifying
     @Query(value = "UPDATE lote_client SET type = 'CANCEL', observation = :observation WHERE id = :id",
