@@ -1,11 +1,11 @@
 package com.pbd.ms_imobilt.lote.service;
 
 import com.pbd.ms_imobilt.client.model.Client;
-import com.pbd.ms_imobilt.exception.LoteCiientCancelException;
-import com.pbd.ms_imobilt.exception.LoteClientFailedDeleteException;
-import com.pbd.ms_imobilt.exception.LoteClientNotFound;
 import com.pbd.ms_imobilt.lote.dto.LoteClientReqDto;
 import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
+import com.pbd.ms_imobilt.lote.exception.LoteCiientCancelException;
+import com.pbd.ms_imobilt.lote.exception.LoteClientFailedDeleteException;
+import com.pbd.ms_imobilt.lote.exception.LoteClientNotFound;
 import com.pbd.ms_imobilt.lote.model.Lote;
 import com.pbd.ms_imobilt.lote.model.LoteClient;
 import com.pbd.ms_imobilt.lote.model.Type;
@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class LoteClientService {
@@ -32,17 +33,24 @@ public class LoteClientService {
     @Autowired
     private  TokenAuthenticationService authToken;
 
-    public LoteClient findByLote(Lote lote){
-        return loteClientRepository.findByLote(lote)
-                .orElseThrow(() -> new LoteClientNotFound("LoteClient not found!",
-                        HttpStatus.BAD_REQUEST));
+    public List<LoteClient> findByLote(Lote lote){
+        List<LoteClient> loteClientList = loteClientRepository.findByLote(lote);
+        if (loteClientList.isEmpty())
+            throw new LoteClientNotFound("LoteClient not found!",
+                    HttpStatus.BAD_REQUEST);
+        return loteClientList;
     }
 
-    public LoteClient findByClientAndLote(Client client, Lote lote){
-        return loteClientRepository.findByLote(client, lote)
-                .orElseThrow(() -> new LoteClientNotFound("LoteClient not found!",
-                        HttpStatus.BAD_REQUEST));
-    }
+     public LoteClient findByClientAndLote(Client client, Lote lote){
+         return loteClientRepository.findByClientAndLote(client, lote)
+                 .orElseThrow(() -> new LoteClientNotFound("LoteClient not found!",
+                         HttpStatus.BAD_REQUEST));
+     }
+
+     public boolean isLoteSale(Lote lote){
+         return loteClientRepository.findByLote(lote)
+                 .stream().anyMatch(l -> l.getType() == Type.SALE);
+     }
 
     @Transactional
     public ResponseEntity<RespIdDefaultDto> save(Client client, Lote lote, Type type){
@@ -74,17 +82,16 @@ public class LoteClientService {
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
 
-    public boolean isLoteClientExists(Client client, Lote lote, Type type){
+    public boolean isLoteClientExists(Lote lote, Type type){
         if (authToken.validateToken(TokenHearder.token)) {
 
-            return loteClientRepository.findByClientAndLoteAndType(
-                    client, lote, type).isPresent();
+            return loteClientRepository.findByLoteAndType(lote, type).isPresent();
         }
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
     }
 
-    public boolean existsByLote(Lote lote){
-        return loteClientRepository.findByLote(lote).isPresent();
+    public boolean existsByLoteAndClient(Lote lote, Client client){
+        return loteClientRepository.findByClientAndLote(client, lote).isPresent();
     }
 
     @Transactional

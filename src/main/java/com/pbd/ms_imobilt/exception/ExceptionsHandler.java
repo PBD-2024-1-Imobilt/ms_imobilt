@@ -1,10 +1,8 @@
 package com.pbd.ms_imobilt.exception;
 
+import com.pbd.ms_imobilt.client.exception.ClientException;
 import com.pbd.ms_imobilt.configuration.ExceptionConfigs;
-
-import jakarta.validation.ValidationException;
-
-import org.hibernate.exception.ConstraintViolationException;
+import com.pbd.ms_imobilt.lote.exception.LoteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.*;
@@ -50,18 +48,12 @@ public class ExceptionsHandler extends ResponseEntityExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(ClientNotFoundException.class)
-    public ProblemDetail clientNotFoundException(){
-        return  exceptionConfigs.problemDetailConfig(HttpStatus.BAD_REQUEST,
-                "Client not found!",
-                "http://localhost:8081/api/v1/client");
+    @ExceptionHandler(ClientException.class)
+    public ProblemDetail clientException(ClientException e){
+        return  exceptionConfigs.problemDetailConfig(e.getHttpStatus(),
+                e.getMessage(), "http://localhost:8081/api/v1/client");
     }
 
-    @ExceptionHandler(DuplicateLoteClientException.class)
-    public ProblemDetail duplicateLoteClientException(DuplicateLoteClientException e){
-        return exceptionConfigs.problemDetailConfig(HttpStatus.BAD_REQUEST,
-               e.getMessage(), "http://localhost:8081/api/v1/lote");
-    }
 
     @ExceptionHandler(LoteException.class)
     public ProblemDetail loteException(LoteException e){
