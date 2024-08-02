@@ -8,15 +8,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LoteClientRepository extends JpaRepository<LoteClient, Integer> {
 
-    boolean existsById(Integer id);
+    List<LoteClient> findByLote(Lote lote);
 
-    Optional<LoteClient> findByLote(Lote lote);
+    Optional<LoteClient> findByClientAndLote(Client client, Lote lote);
 
-    Optional<LoteClient> findByClientAndLoteAndType(Client client, Lote lote, Type type);
+    Optional<LoteClient> findByLoteAndType(Lote lote, Type type);
 
     @Modifying
     @Query(value = "UPDATE lote_client SET type = 'CANCEL', observation = :observation WHERE id = :id",

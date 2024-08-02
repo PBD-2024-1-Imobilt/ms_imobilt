@@ -1,9 +1,9 @@
 package com.pbd.ms_imobilt.client.controller;
 
 import com.pbd.ms_imobilt.client.dto.ClientReqDto;
+import com.pbd.ms_imobilt.client.exception.ClientNotFoundException;
 import com.pbd.ms_imobilt.client.model.Client;
 import com.pbd.ms_imobilt.client.service.ClientService;
-import com.pbd.ms_imobilt.exception.ClientNotFoundException;
 import com.pbd.ms_imobilt.responsedefault.RespIdDefaultDto;
 import com.pbd.ms_imobilt.token.model.TokenHearder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,7 +51,8 @@ public class ClientController {
         TokenHearder.token = tokenHeader;
 
         Optional<Client> oldClient = Optional.ofNullable(clientService.findById(id)
-                .orElseThrow(ClientNotFoundException::new));
+                .orElseThrow(() -> new ClientNotFoundException("Client not found!",
+                        HttpStatus.BAD_REQUEST)));
 
         BeanUtils.copyProperties(clientReqDto, oldClient.get());
 
