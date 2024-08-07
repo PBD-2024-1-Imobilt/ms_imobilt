@@ -3,7 +3,9 @@ package com.pbd.ms_imobilt.lote.service;
 import com.pbd.ms_imobilt.client.model.Client;
 import com.pbd.ms_imobilt.lote.dto.LoteClientReqDto;
 import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
-import com.pbd.ms_imobilt.lote.exception.*;
+import com.pbd.ms_imobilt.lote.exception.LoteCiientCancelException;
+import com.pbd.ms_imobilt.lote.exception.LoteClientFailedDeleteException;
+import com.pbd.ms_imobilt.lote.exception.LoteClientNotFound;
 import com.pbd.ms_imobilt.lote.model.Lote;
 import com.pbd.ms_imobilt.lote.model.LoteClient;
 import com.pbd.ms_imobilt.lote.model.Type;
@@ -57,22 +59,11 @@ public class LoteClientService {
 
         BeanUtils.copyProperties(new LoteClientReqDto(client, lote, type, LocalDateTime.now()), loteClient);
 
-        boolean isLoteSale = loteClientRepository.findByLote(lote)
-                .stream().anyMatch(l -> l.getType() == Type.SALE);
-
-        if (isLoteSale)
-            throw new SaleException("This lote already been sold !", HttpStatus.BAD_REQUEST);
-
         if (loteClientRepository.existsByLoteAndClient(lote, client)) {
 
             LoteClient loteClientOld = loteClientRepository.findByClientAndLote(client, lote)
                     .orElseThrow(() -> new LoteClientNotFound("LoteClient not found!",
                             HttpStatus.BAD_REQUEST));
-
-            if (loteClientOld.getType() == type)
-                throw new DuplicateLoteClientException(
-                        ("Lote already %s by this client in %s")
-                                .formatted(type.getValue(), loteClientOld.getCreateAt()), HttpStatus.BAD_REQUEST);
 
             BeanUtils.copyProperties(new RespIdDefaultDto(loteClientOld.getId()), loteClient);
         }

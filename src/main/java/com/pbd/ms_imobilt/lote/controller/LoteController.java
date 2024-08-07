@@ -2,11 +2,13 @@ package com.pbd.ms_imobilt.lote.controller;
 
 import com.pbd.ms_imobilt.client.model.Client;
 import com.pbd.ms_imobilt.client.service.ClientService;
+import com.pbd.ms_imobilt.infra.security.ValidationService;
 import com.pbd.ms_imobilt.lote.dto.InputReqLoteClientDto;
 import com.pbd.ms_imobilt.lote.dto.LoteRespDto;
 import com.pbd.ms_imobilt.lote.dto.ObservationReqDto;
 import com.pbd.ms_imobilt.lote.exception.LoteCiientCancelException;
 import com.pbd.ms_imobilt.lote.exception.ObservationFieldException;
+import com.pbd.ms_imobilt.lote.exception.ReserveException;
 import com.pbd.ms_imobilt.lote.exception.SaleException;
 import com.pbd.ms_imobilt.lote.model.Lote;
 import com.pbd.ms_imobilt.lote.model.LoteClient;
@@ -38,6 +40,9 @@ public class LoteController {
     @Autowired
     private  LoteClientService loteClientService;
 
+    @Autowired
+    private ValidationService validationService;
+
     @Operation(summary = "List Lote", description = "Method to list lotes", tags = "Lote")
     @GetMapping()
     public ResponseEntity<Map<String, List<LoteRespDto>>> getAllLotes(@RequestHeader("token") String tokenHearder){
@@ -58,6 +63,11 @@ public class LoteController {
 
         var lote = loteService.findByID(id_lote);
 
+        if (validationService.isLoteSaleOrReserved(client, lote, Type.RESERVE))
+            throw new ReserveException("This lote already been reserved !", HttpStatus.BAD_REQUEST);
+        else if (validationService.isLoteSaleOrReserved(client, lote, Type.SALE))
+            throw new SaleException("This lote already been sold !", HttpStatus.BAD_REQUEST);
+
         return loteClientService.save(client, lote, Type.RESERVE);
     }
 
@@ -74,7 +84,10 @@ public class LoteController {
 
         Lote lote = loteService.findByID(id_lote);
 
-        if (loteClientService.isLoteReservedByAnotherClient(client, lote))
+        if (validationService.isLoteSaleOrReserved(client, lote, Type.SALE))
+            throw new SaleException("This lote already been sold !", HttpStatus.BAD_REQUEST);
+
+        else if (loteClientService.isLoteReservedByAnotherClient(client, lote))
             throw new SaleException("Sale of a lot reserved by another client is not allowed",
                     HttpStatus.BAD_REQUEST);
 
