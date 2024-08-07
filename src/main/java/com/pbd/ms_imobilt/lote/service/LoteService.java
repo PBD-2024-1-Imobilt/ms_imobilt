@@ -32,7 +32,7 @@ public class LoteService {
     private TemplateConfig templateConfig;
 
     public Optional<Lote> findByDescriptionAndBlock(String description, Block block){
-        return loteRepository.findByDescriptionAndBlock(description, block);
+        return loteRepository.findByDescriptionAndBlock(description, block.getId());
     }
 
     public Lote findByID(int id){

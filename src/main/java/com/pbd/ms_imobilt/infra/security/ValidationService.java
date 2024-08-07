@@ -26,14 +26,16 @@ public class ValidationService {
                     blocks = new ArrayList<>(),
                     lotes = new ArrayList<>();
             for (InputBlocksAndLotesReqDto block : listBlocks){
-                if (blocks.contains(block.description()))
+                if (!blocks.stream().filter(b -> b.replace(" ", "")
+                        .equalsIgnoreCase(block.description().replace(" ", ""))).toList().isEmpty())
                     erros.add("Não pode existir quadras com a mesma descrição [%s]"
                             .formatted(block.description()));
                 else
                     blocks.add(block.description());
 
                 for (InputLoteReqDto lote : block.lotes())
-                    if (lotes.contains(lote.description()))
+                    if (!lotes.stream().filter(l -> l.replace(" ", "")
+                            .equalsIgnoreCase(lote.description().replace(" ", ""))).toList().isEmpty())
                         erros.add("Não pode existir lotes com a mesma descrição [%s] na quadra [%s]"
                                 .formatted(lote.description(), block.description()));
 
