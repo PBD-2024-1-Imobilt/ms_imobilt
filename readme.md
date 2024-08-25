@@ -15,7 +15,7 @@
 * The project documentation was made using Swagger UI.
   * [Link to documentation](http://localhost:8081/swagger-ui/index.html)
     * ***Obs:*** *As the server is local, the api must be running.*
-  * Below, some images and details from the project documentation:
+* Below, some images and details from the project documentation:
 
 ### Lote
 ![img lote](assets/img.png)
