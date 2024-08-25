@@ -49,6 +49,7 @@
       }
       ```
 * **GET** /api/v1/lote
+  <br>
 ![Paramenters](assets/img_2.png)
   * **Response**
     ```shell
