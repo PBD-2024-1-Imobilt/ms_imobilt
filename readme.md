@@ -48,33 +48,47 @@
         "id": 0
       }
       ```
-* **GET** /api/v1/lote
-  <br>
-![Paramenters](assets/img_2.png)
-  * **Response**
-    ```shell
-      { 
-          "additionalProp1": [
-              {
-                  "id": 0,
-                  "lote": "string",
-                  "enterprise": {
+   * **POST** /api/v1/lote/(id_lote)/reserve
+  ![Paramenters](assets/img_1.png)
+      * **Payload**
+        ```shell
+         {
+           "client_id": 0
+         }
+        ```
+      * **Response**
+        ```shell
+        {
+          "id": 0
+        }
+        ```
+  * **GET** /api/v1/lote
+    <br>
+  ![Paramenters](assets/img_2.png)
+    * **Response**
+      ```shell
+        { 
+            "additionalProp1": [
+                {
                     "id": 0,
-                    "description": "string"
-                  },
-                 "block": "string"
-              }
-          ],
-          "additionalProp2": [
-             {
-               "id": 0,
-               "lote": "string",
-               "enterprise": {
+                    "lote": "string",
+                    "enterprise": {
+                      "id": 0,
+                      "description": "string"
+                    },
+                   "block": "string"
+                }
+            ],
+            "additionalProp2": [
+               {
                  "id": 0,
-                 "description": "string"
-               },
-               "block": "string"
-             }
-          ]
-      }
-    ```
+                 "lote": "string",
+                 "enterprise": {
+                   "id": 0,
+                   "description": "string"
+                 },
+                 "block": "string"
+               }
+            ]
+        }
+      ```
