@@ -98,6 +98,7 @@
 ![Documentation](assets/image.png)
 * **Endpoints:**
    * **PUT** /api/v1/client/{id}
+     <br>
   ![Paramenters](assets/image_2.png)
     * **Payload**
       ```shell
@@ -114,6 +115,7 @@
       }
       ``` 
    * **POST** /api/v1/client
+     <br>
   ![Paramenters](assets/image_3.png)
     * **Payload**
       ```shell
@@ -133,6 +135,7 @@
 ![Documentation](assets/image_4.png)
 * **Endpoints:**
    * **POST** /api/v1/enterprise
+     <br>
   ![Paramenters](assets/image_3.png)
     * **Payload**
       ```shell
