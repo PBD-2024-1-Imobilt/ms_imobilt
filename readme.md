@@ -10,6 +10,8 @@
   - **Program:** Information Systems
   - **Course:** DataBase Project
   - **Docente:** Prof. Héldon José Oliveira Albuquerque
+* Create a new bank in postgresql with the name imobilt_bd
+* Make the appropriate database settings in the project's application.properties
 
 ## Project Documentation
 * The project documentation was made using Swagger UI.
@@ -19,8 +21,8 @@
 
 ### Lote
 ![img lote](assets/img.png)
-* **EndPoints:**
-  * **PUT** /api/v1/lote/(id_lote)/cancel
+* **Endpoints:**
+  * **PUT** /api/v1/lote/{id_lote}/cancel
   ![Paramenters](assets/img_1.png)
     * **Payload**
       ```shell
@@ -34,7 +36,7 @@
         "id": 0
       }
       ```
-  * **POST** /api/v1/lote/(id_lote)/sale
+  * **POST** /api/v1/lote/{id_lote}/sale
     ![Paramenters](assets/img_1.png)
     * **Payload**
       ```shell
@@ -48,7 +50,7 @@
         "id": 0
       }
       ```
-   * **POST** /api/v1/lote/(id_lote)/reserve
+   * **POST** /api/v1/lote/{id_lote}/reserve
   ![Paramenters](assets/img_1.png)
       * **Payload**
         ```shell
@@ -91,4 +93,71 @@
                }
             ]
         }
+      ```
+### Client
+![Documentation](assets/image.png)
+* **Endpoints:**
+   * **PUT** /api/v1/client/{id}
+  ![Paramenters](assets/image_2.png)
+    * **Payload**
+      ```shell
+      {
+        "name": "string",
+        "phone": "string",
+        "cpf": "string"
+      }
+      ```
+    * **Response**
+      ```shell
+      {
+        "id": 0
+      }
+      ``` 
+   * **POST** /api/v1/client
+  ![Paramenters](assets/image_3.png)
+    * **Payload**
+      ```shell
+      {
+        "name": "string",
+        "phone": "string",
+        "cpf": "string"
+      }
+      ```
+    * **Response**
+      ```shell
+      {
+        "id": 0
+      }
+      ``` 
+### Enterprise
+![Documentation](assets/image_4.png)
+* **Endpoints:**
+   * **POST** /api/v1/enterprise
+  ![Paramenters](assets/image_3.png)
+    * **Payload**
+      ```shell
+      {
+        "description": "string"
+      }
+      ```
+    * **Response**
+      ```shell
+      {
+        "id": 0
+      }
+      ``` 
+   * **POST** /api/v1/enterprise/{enterprise_ìd}/blocks
+  ![Paramenters](assets/image_5.png)
+    * **Payload**
+      ```shell
+      [
+        {
+          "description": "string",
+            "lotes": [
+              {
+                "description": "string"
+              }
+            ]
+        }
+      ]
       ```
